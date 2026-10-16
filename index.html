@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>我的 AI 角色</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: #171522;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+main {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+.panel {
+  background: #262337;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 16px;
+}
+h2 { color: #e4baff; }
+#chat {
+  height: 300px;
+  overflow-y: auto;
+  margin: 18px 0;
+}
+.msg {
+  background: #403653;
+  padding: 12px;
+  border-radius: 12px;
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+input, select, button {
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 15px;
+}
+#message { width: 68%; }
+button {
+  background: #bd8cff;
+  color: #171522;
+  font-weight: bold;
+}
+label { display: block; margin: 16px 0; }
+input[type="range"] { width: 100%; }
+select { max-width: 100%; }
+</style>
+</head>
+<body>
+<main>
+  <section class="panel">
+    <h2>♡ 我的 AI 角色</h2>
+    <h3>小月 🌙</h3>
+    <p>你的专属聊天伙伴</p>
+    <div id="chat" aria-live="polite">
+      <div class="msg">小月：你好呀，今天想聊些什么？</div>
+    </div>
+    <form id="form">
+      <input id="message" placeholder="输入消息..." required>
+      <button type="submit">发送</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h3>🎙 声音设置</h3>
+    <label>选择声线
+      <select id="voice"></select>
+    </label>
+    <label>语速：<span id="speedVal">1</span>
+      <input id="speed" type="range"
+      min="0.5" max="2" step="0.1" value="1">
+    </label>
+    <label>音高：<span id="pitchVal">1</span>
+      <input id="pitch" type="range"
+      min="0.5" max="2" step="0.1" value="1">
+    </label>
+    <button type="button" id="test">试听声音</button>
+  </section>
+</main>
+<script>
+const chat = document.querySelector("#chat");
+const form = document.querySelector("#form");
+const message = document.querySelector("#message");
+const voiceSelect = document.querySelector("#voice");
+
+function addMessage(text, who) {
+  const div = document.createElement("div");
+  div.className = "msg";
+  div.textContent = who + "：" + text;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+form.addEventListener("submit", e => {
+  e.preventDefault();
+  const text = message.value.trim();
+  if (!text) return;
+  addMessage(text, "我");
+  message.value = "";
+  setTimeout(() => {
+    addMessage("我听到啦！我们继续聊吧。", "小月");
+  }, 400);
+});
+
+function loadVoices() {
+  const voices = speechSynthesis.getVoices();
+  const old = voiceSelect.value;
+  voiceSelect.replaceChildren();
+  voices.forEach((v, i) => {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.textContent = v.name + " (" + v.lang + ")";
+    voiceSelect.appendChild(opt);
+  });
+  if (old !== "") voiceSelect.value = old;
+}
+if ("speechSynthesis" in window) {
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+document.querySelector("#speed").oninput = e => {
+  document.querySelector("#speedVal").textContent = e.target.value;
+};
+document.querySelector("#pitch").oninput = e => {
+  document.querySelector("#pitchVal").textContent = e.target.value;
+};
+
+document.querySelector("#test").onclick = () => {
+  if (!("speechSynthesis" in window)) {
+    alert("当前浏览器不支持语音合成");
+    return;
+  }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(
+    "你好呀，我是你专属的 AI 角色小月。"
+  );
+  const voices = speechSynthesis.getVoices();
+  u.voice = voices[Number(voiceSelect.value)] || null;
+  u.rate = Number(document.querySelector("#speed").value);
+  u.pitch = Number(document.querySelector("#pitch").value);
+  speechSynthesis.speak(u);
+};
+</script>
+</body>
+</html>
