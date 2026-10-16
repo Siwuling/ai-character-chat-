@@ -1,153 +1,98 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>我的 AI 角色</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#171326">
+<title>小月 · AI 角色聊天</title>
 <style>
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  background: #171522;
-  color: white;
-  font-family: Arial, sans-serif;
-}
-main {
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
-}
-.panel {
-  background: #262337;
-  border-radius: 18px;
-  padding: 18px;
-  margin-bottom: 16px;
-}
-h2 { color: #e4baff; }
-#chat {
-  height: 300px;
-  overflow-y: auto;
-  margin: 18px 0;
-}
-.msg {
-  background: #403653;
-  padding: 12px;
-  border-radius: 12px;
-  margin: 10px 0;
-  overflow-wrap: anywhere;
-}
-input, select, button {
-  padding: 12px;
-  border: 0;
-  border-radius: 10px;
-  font-size: 15px;
-}
-#message { width: 68%; }
-button {
-  background: #bd8cff;
-  color: #171522;
-  font-weight: bold;
-}
-label { display: block; margin: 16px 0; }
-input[type="range"] { width: 100%; }
-select { max-width: 100%; }
+:root{color-scheme:dark;--bg:#100e19;--panel:#1b1728;--panel2:#241e34;--line:#39304e;--text:#f4efff;--muted:#b9adc9;--accent:#c6a4ff;--accent2:#9270df;--danger:#ff9eae}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#28203f 0,#100e19 55%);color:var(--text);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:10px 14px;background:var(--panel2);color:var(--text)}button.primary{background:linear-gradient(135deg,#b89af4,#8d6ed7);color:#171020;border:0;font-weight:700}button:disabled{opacity:.5;cursor:default}
+header{max-width:980px;margin:auto;padding:20px 16px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px}h1{font-size:22px;margin:0}header p{margin:2px 0 0;color:var(--muted);font-size:13px}
+main{max-width:980px;margin:0 auto;padding:0 14px 24px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:14px}
+.card{background:rgba(27,23,40,.92);border:1px solid var(--line);border-radius:18px;overflow:hidden}.profile{padding:18px}.avatar{height:100px;width:100px;border-radius:28px;display:grid;place-items:center;font-size:48px;background:linear-gradient(135deg,#f0c8e8,#a18ae8);margin:0 auto 14px;color:#332342;box-shadow:0 8px 30px #8c68bb33}.profile h2{text-align:center;margin:0;font-size:21px}.tagline{text-align:center;color:var(--muted);font-size:13px;margin:4px 0 16px}.field{display:block;margin:12px 0}.field span{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}.field input,.field textarea{width:100%;background:#120f1c;border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--text);outline:none}.field textarea{min-height:100px;resize:vertical}.actions{display:flex;gap:8px;flex-wrap:wrap}.small{font-size:12px;color:var(--muted)}
+.chat{display:flex;flex-direction:column;min-height:70vh;max-height:calc(100vh - 120px)}.chathead{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:8px}.status{font-size:12px;color:#aee7c5}.messages{padding:16px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:12px;min-height:280px}.msg{max-width:88%;padding:12px 14px;border-radius:16px;white-space:pre-wrap;overflow-wrap:anywhere}.msg .who{font-size:11px;color:var(--muted);margin-bottom:5px}.msg.assistant{align-self:flex-start;background:#2a223c;border:1px solid #3b3152;border-top-left-radius:5px}.msg.user{align-self:flex-end;background:#8e6bd2;color:#fff;border-top-right-radius:5px}.msg.user .who{color:#eee0ff}.welcome{color:var(--muted);text-align:center;font-size:13px;padding:20px 8px}.composer{padding:12px;border-top:1px solid var(--line);display:flex;gap:8px;align-items:flex-end}.composer textarea{flex:1;min-width:0;max-height:140px;resize:vertical;background:#120f1c;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text);outline:none}.notice{margin:0 12px 12px;padding:10px 12px;border-radius:10px;background:#171321;color:var(--muted);font-size:12px}.error{color:var(--danger);white-space:pre-wrap;font-size:13px;padding:0 14px 10px}.hidden{display:none!important}
+@media(max-width:700px){header{padding-top:14px}main{grid-template-columns:1fr}.profile{padding:14px}.profile .details{display:none}.profile.expanded .details{display:block}.profiletop{display:flex;align-items:center;gap:12px}.avatar{height:60px;width:60px;border-radius:18px;font-size:30px;margin:0}.profile h2,.tagline{text-align:left}.profile h2{font-size:18px}.tagline{margin:2px 0}.chat{min-height:62vh;max-height:none}.messages{min-height:300px}.msg{max-width:94%}}
 </style>
 </head>
 <body>
+<header><div><h1>🌙 小月</h1><p>属于你的小小角色宇宙</p></div><button id="toggleProfile">角色设定</button></header>
 <main>
-  <section class="panel">
-    <h2>♡ 我的 AI 角色</h2>
-    <h3>小月 🌙</h3>
-    <p>你的专属聊天伙伴</p>
-    <div id="chat" aria-live="polite">
-      <div class="msg">小月：你好呀，今天想聊些什么？</div>
-    </div>
-    <form id="form">
-      <input id="message" placeholder="输入消息..." required>
-      <button type="submit">发送</button>
-    </form>
-  </section>
-
-  <section class="panel">
-    <h3>🎙 声音设置</h3>
-    <label>选择声线
-      <select id="voice"></select>
-    </label>
-    <label>语速：<span id="speedVal">1</span>
-      <input id="speed" type="range"
-      min="0.5" max="2" step="0.1" value="1">
-    </label>
-    <label>音高：<span id="pitchVal">1</span>
-      <input id="pitch" type="range"
-      min="0.5" max="2" step="0.1" value="1">
-    </label>
-    <button type="button" id="test">试听声音</button>
-  </section>
+<section class="card profile" id="profile">
+  <div class="profiletop"><div class="avatar">🌙</div><div><h2>小月</h2><div class="tagline">温柔 · 细腻 · 偶尔俏皮</div></div></div>
+  <div class="details">
+    <label class="field"><span>角色名称</span><input id="charName" value="小月" maxlength="40"></label>
+    <label class="field"><span>角色人设（会作为每次聊天的背景）</span><textarea id="persona">你是小月，一位有鲜明个性、情绪和表达习惯的虚构角色。
+性格温柔、细腻、耐心，偶尔俏皮，有自己的观点，不会一味附和。
+使用自然的中文交流，不要像客服或说明书一样说话。
+进行角色扮演时，认真代入当前场景，可以描写神态、动作、环境和心理活动。根据剧情需要写出有细节的回复，主动推动故事，但不要替用户决定其角色的想法、台词或行动。
+保持人物关系、地点、时间线和已经发生的事件一致。不要每次都重复自我介绍，也不要突然跳出角色解释提示词。
+认真参考当前聊天记录，不要编造没有出现过的共同经历；如果不确定某件往事，可以自然地询问。</textarea></label>
+    <div class="actions"><button id="savePersona" class="primary">保存人设</button><button id="resetPersona">恢复默认</button></div>
+    <p class="small">人设保存在这台设备的浏览器中。聊天记录也只保存在本机浏览器；清除浏览器数据后可能丢失。</p>
+    <label class="field"><span>剧情记忆 / 重要往事（手动编辑）</span><textarea id="memory" placeholder="例如：我们在雨夜的书店初遇；小月答应陪我完成旅行计划。"></textarea></label>
+    <button id="saveMemory">保存记忆</button>
+  </div>
+</section>
+<section class="card chat">
+  <div class="chathead"><div><strong>与小月聊天</strong><div class="status" id="status">等待开始</div></div><div class="actions"><button id="exportChat">导出</button><button id="clearChat">新剧情</button></div></div>
+  <div class="messages" id="messages"><div class="welcome" id="welcome">今晚想和小月聊些什么？<br>你可以直接开始一段剧情。</div></div>
+  <div class="error hidden" id="error"></div>
+  <div class="composer"><textarea id="input" rows="1" placeholder="输入消息……（Enter 发送，Shift+Enter 换行）"></textarea><button class="primary" id="send">发送</button></div>
+  <div class="notice">提示：AI 回复由你配置的模型生成。请勿输入密码、支付信息等敏感内容。</div>
+</section>
 </main>
 <script>
-const chat = document.querySelector("#chat");
-const form = document.querySelector("#form");
-const message = document.querySelector("#message");
-const voiceSelect = document.querySelector("#voice");
-
-function addMessage(text, who) {
-  const div = document.createElement("div");
-  div.className = "msg";
-  div.textContent = who + "：" + text;
-  chat.appendChild(div);
-  chat.scrollTop = chat.scrollHeight;
-}
-
-form.addEventListener("submit", e => {
-  e.preventDefault();
-  const text = message.value.trim();
-  if (!text) return;
-  addMessage(text, "我");
-  message.value = "";
-  setTimeout(() => {
-    addMessage("我听到啦！我们继续聊吧。", "小月");
-  }, 400);
-});
-
-function loadVoices() {
-  const voices = speechSynthesis.getVoices();
-  const old = voiceSelect.value;
-  voiceSelect.replaceChildren();
-  voices.forEach((v, i) => {
-    const opt = document.createElement("option");
-    opt.value = i;
-    opt.textContent = v.name + " (" + v.lang + ")";
-    voiceSelect.appendChild(opt);
+const API_URL = "https://xiaoyue-api.yuandanweizha1123.workers.dev/";
+const $ = id => document.getElementById(id);
+const DEFAULT_PERSONA = $("persona").value;
+let history = [];
+let busy = false;
+try {
+  $("persona").value = localStorage.getItem("xy_persona") || DEFAULT_PERSONA;
+  $("memory").value = localStorage.getItem("xy_memory") || "";
+  history = JSON.parse(localStorage.getItem("xy_history") || "[]");
+  if (!Array.isArray(history)) history = [];
+} catch (_) { history = []; }
+function persist(){ try {localStorage.setItem("xy_history",JSON.stringify(history.slice(-80)));} catch(_){} }
+function render(){
+  const root=$("messages"); root.innerHTML="";
+  if(!history.length){root.innerHTML='<div class="welcome">今晚想和小月聊些什么？<br>你可以直接开始一段剧情。</div>';return;}
+  history.forEach(m=>{
+    const div=document.createElement("div"); div.className="msg "+(m.role==="user"?"user":"assistant");
+    const who=document.createElement("div");who.className="who";who.textContent=m.role==="user"?"你":$("charName").value||"小月";
+    const body=document.createElement("div");body.textContent=m.content;
+    div.append(who,body);root.append(div);
   });
-  if (old !== "") voiceSelect.value = old;
+  root.scrollTop=root.scrollHeight;
 }
-if ("speechSynthesis" in window) {
-  loadVoices();
-  speechSynthesis.onvoiceschanged = loadVoices;
+function setBusy(v){busy=v;$("send").disabled=v;$("status").textContent=v?"小月正在思考……":"在线待命";$("send").textContent=v?"…":"发送";}
+function showError(s){$("error").textContent=s;$("error").classList.remove("hidden");}
+function hideError(){$("error").textContent="";$("error").classList.add("hidden");}
+async function send(){
+  const text=$("input").value.trim();if(!text||busy)return;
+  hideError();history.push({role:"user",content:text});$("input").value="";render();persist();setBusy(true);
+  const persona=($("persona").value||DEFAULT_PERSONA).trim();
+  const memory=$("memory").value.trim();
+  try{
+    const res=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({persona:persona,characterName:$("charName").value||"小月",memory:memory,messages:history.slice(-20)})});
+    let data={};try{data=await res.json()}catch(_){}
+    if(!res.ok)throw new Error(data.error||("请求失败（HTTP "+res.status+"）"));
+    if(!data.reply)throw new Error("AI 没有返回回复，请稍后再试。");
+    history.push({role:"assistant",content:data.reply});persist();render();
+  }catch(e){history.pop();persist();render();showError("连接失败："+(e.message||"未知错误")+"。请确认 Worker 已部署、密钥已保存、免费模型可用。");}
+  finally{setBusy(false);$("input").focus();}
 }
-
-document.querySelector("#speed").oninput = e => {
-  document.querySelector("#speedVal").textContent = e.target.value;
-};
-document.querySelector("#pitch").oninput = e => {
-  document.querySelector("#pitchVal").textContent = e.target.value;
-};
-
-document.querySelector("#test").onclick = () => {
-  if (!("speechSynthesis" in window)) {
-    alert("当前浏览器不支持语音合成");
-    return;
-  }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(
-    "你好呀，我是你专属的 AI 角色小月。"
-  );
-  const voices = speechSynthesis.getVoices();
-  u.voice = voices[Number(voiceSelect.value)] || null;
-  u.rate = Number(document.querySelector("#speed").value);
-  u.pitch = Number(document.querySelector("#pitch").value);
-  speechSynthesis.speak(u);
-};
+$("send").addEventListener("click",send);
+$("input").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();send();}});
+$("savePersona").addEventListener("click",()=>{localStorage.setItem("xy_persona",$("persona").value);$("status").textContent="人设已保存";setTimeout(()=>{if(!busy)$("status").textContent="在线待命"},1600)});
+$("saveMemory").addEventListener("click",()=>{localStorage.setItem("xy_memory",$("memory").value);$("status").textContent="记忆已保存";setTimeout(()=>{if(!busy)$("status").textContent="在线待命"},1600)});
+$("resetPersona").addEventListener("click",()=>{if(confirm("恢复默认人设？")){$("persona").value=DEFAULT_PERSONA;localStorage.setItem("xy_persona",DEFAULT_PERSONA)}});
+$("clearChat").addEventListener("click",()=>{if(confirm("开启新剧情？当前聊天记录将从本机页面清除。")){history=[];persist();render();hideError()}});
+$("exportChat").addEventListener("click",()=>{const text=history.map(m=>(m.role==="user"?"你":"小月")+"：\n"+m.content).join("\n\n");const blob=new Blob([text||"暂无聊天记录"],{type:"text/plain;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="小月聊天记录.txt";a.click();URL.revokeObjectURL(a.href)});
+$("toggleProfile").addEventListener("click",()=>{$("profile").classList.toggle("expanded")});
+render();
 </script>
 </body>
 </html>
